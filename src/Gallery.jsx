@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 
 const URL =
-  'https://api.unsplash.com/search/photos?client_id=hFd51wRNtDqxT14P5yaW89PjV0Xy-N1rK57NjgWkrJE&query=dog';
+  'https://api.unsplash.com/search/photos?client_id=hFd51wRNtDqxT14P5yaW89PjV0Xy-N1rK57NjgWkrJE&query=dogs';
 
 const Gallery = () => {
   const response = useQuery({
@@ -12,8 +12,38 @@ const Gallery = () => {
       return result.data;
     },
   });
-  console.log(response);
+  if (response.isLoading) {
+    return (
+      <section className="image-container">
+        <h4>Loading...</h4>
+      </section>
+    );
+  }
 
-  return <h2>Gallery</h2>;
+  if (response.isError) {
+    return (
+      <section className="image-container">
+        <h4>{response.error.message}</h4>
+      </section>
+    );
+  }
+  const results = response.data.results;
+
+  if (results.length < 1) {
+    return (
+      <section className="image-container">
+        <h4>no images matched your search term</h4>
+      </section>
+    );
+  }
+
+  return (
+    <section className="image-container">
+      {results.map((item) => {
+        const url = item?.urls?.regular;
+        return <img key={item.id} src={url} alt={item.alt_description} className="img" />;
+      })}
+    </section>
+  );
 };
 export default Gallery;
